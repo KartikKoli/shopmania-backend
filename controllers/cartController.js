@@ -51,9 +51,7 @@ export const addToCart = async (req, res) => {
     const userId = req.user._id;
     const user = await User.findById(userId);
     const cart = await Cart.findById(user.cartId);
-    const existingItem = cart.products.find(
-      (p) => p.item.toString() === id
-    );
+    const existingItem = cart.products.find((p) => p.item.toString() === id);
     if (existingItem) {
       existingItem.quantity += 1;
     } else {
@@ -74,3 +72,36 @@ export const addToCart = async (req, res) => {
   }
 };
 
+export const emptyCart = async (req, res) => {
+  try {
+    const user = req.user;
+    const id = user.cartId;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Not a valid cart id.",
+      });
+    }
+    const cart = await Cart.findById(id);
+    if (!cart) {
+      return res.status(404).json({
+        success: false,
+        message: "Cart not found.",
+      });
+    }
+    cart.products = [];
+    cart.amount = 0;
+    await cart.save();
+    res.status(200).json({
+      success: true,
+      message: "Cart emptied successfully",
+      cart
+    });
+  } catch (error) {
+    console.log(`Error in emptyCart api: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+    });
+  }
+};
