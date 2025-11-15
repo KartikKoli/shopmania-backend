@@ -5,7 +5,7 @@ import Cart from "../models/Cart.js";
 
 export const viewCart = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.user.cartId;
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
@@ -34,7 +34,7 @@ export const viewCart = async (req, res) => {
 
 export const addToCart = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.user.cartId;
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
@@ -95,7 +95,7 @@ export const emptyCart = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Cart emptied successfully",
-      cart
+      cart,
     });
   } catch (error) {
     console.log(`Error in emptyCart api: ${error.message}`);
